@@ -1,0 +1,29 @@
+
+*{
+    margin: 0;
+    padding: 0;
+    font-family: 'Shadows Into Light', cursive;
+}
+
+body{
+    background: #123;
+}
+
+#canvas{
+    position: absolute;
+    -webkit-filter: url("#goo");
+    filter: url("#goo");
+}
+
+#stats{
+    position:absolute;
+    top:0;
+    left:0;
+    z-index: 2;
+}
+
+#audio{
+    position: absolute;
+    left: 0%;
+    bottom: 0;
+}
