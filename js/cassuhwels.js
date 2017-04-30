@@ -1,5 +1,12 @@
-
-function Jumper(){
+var pathToImgDir = "img/";
+var pathToObjDir = "img/objects/";
+var gamefield = null;
+var config = {
+    'numberOfFields'    : 8,
+    'gamefieldWidth'    : 765,
+    'margin'            : 30
+};
+function Cassuhwels(){
 
     var size = [1920, 1080];
     var ratio = size[0] / size[1];
@@ -70,14 +77,21 @@ function Jumper(){
 
     // create the root of the scene graph
     var stage = new PIXI.Container();
-
     var stageObjects = [];
 
+    // add objectContainer to general StageObjects-Array
+    var jewelsContainer = new PIXI.Container();
+    stageObjects.push(jewelsContainer);
+    var gameFieldContainer = new PIXI.Container();
+    stageObjects.push(gameFieldContainer);
 
     for (var index in stageObjects) {
         var container = stageObjects[index];
         stage.addChild(container);
     }
+
+    gamefield =  new GameField(config);
+    gameFieldContainer.addChild(gamefield);
 
     animate();
     function animate() {
@@ -96,11 +110,21 @@ function Jumper(){
         for (var indexStage in stageObjects) {
             var container = stageObjects[indexStage];
 
-            var clickedObjects = 0;
             for (var indexObject in container.children) {
-                var object = container.children[indexObject];
 
+                var object = container.children[indexObject];
                 if(object){
+
+                    if(object.children.length > 0){
+                        for (var childIndex in object.children) {
+                            var child = object.children[childIndex];
+                            if(typeof child.lowerAlpha === "function"
+                                || typeof child.lowerAlpha === "object" ){
+                                child.lowerAlpha(deltaTime);
+                            }
+                        }
+                    }
+
                     if(typeof object.calculate === "function"
                         || typeof object.calculate === "object" ){
                         object.calculate();
@@ -116,4 +140,4 @@ function Jumper(){
     }
 };
 
-var jumper = new Jumper();
+var cassuhwels = new Cassuhwels();
