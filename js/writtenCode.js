@@ -262,9 +262,9 @@ function createGameField() {
         var notUsedGrids = [];
         for (var indexx = 0; indexx < fieldSize; indexx++) {
             for (var indexy = 0; indexy < fieldSize; indexy++) {
-                gridField = gamefield.grid[indexx][indexy];
-                if (gridField.isBlocked == false) {
-                    notUsedGrids.push(gridField);
+                grid = gamefield.grid[indexx][indexy];
+                if (grid.isBlocked == false) {
+                    notUsedGrids.push(grid);
                 }
             }
         }
@@ -369,8 +369,8 @@ function createGameField() {
         // destroy all
         for (var indexx = 0; indexx < fieldSize; indexx++) {
             for (var indexy = 0; indexy < fieldSize; indexy++) {
-                gridField = gamefield.grid[indexx][indexy];
-                gridField.destroyChild();
+                grid = gamefield.grid[indexx][indexy];
+                grid.destroyChild();
             }
         }
         score = -1;

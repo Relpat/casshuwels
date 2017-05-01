@@ -14,6 +14,7 @@ function GameField(config) {
     gamefield.position.x = 1080;
     gamefield.position.y = 30;
     gamefield.lastMovement = "";
+    gamefield.gridsToDelete = [];
 
     /**
      * creates the correct position in Gamefield
@@ -21,7 +22,7 @@ function GameField(config) {
      * @param y
      * @returns {{x: number, y: number}}
      */
-    gamefield.getGridPositionByIndex = function(x, y) {
+    gamefield.getGridPositionByIndex = function (x, y) {
         var position = {
             x: gamefieldWidth / numberOfFields * x + margin,
             y: gamefieldWidth / numberOfFields * y + margin
@@ -31,16 +32,22 @@ function GameField(config) {
     };
 
     // gamegrid Init
-    gamefield.grid = [];
-    for (var indexX = 0; indexX < numberOfFields; indexX++) {
-        gamefield.grid[indexX] = [];
-        for (var indexY = 0; indexY < numberOfFields; indexY++) {
-            gamefield.grid[indexX][indexY] = new Grid(
-                indexX,
-                indexY,
-                gamefield.getGridPositionByIndex(indexX,indexY));
+    (function initGameGrid() {
+        gamefield.grid = [];
+        for (var indexX = 0; indexX < numberOfFields; indexX++) {
+            gamefield.grid[indexX] = [];
+            for (var indexY = 0; indexY < numberOfFields; indexY++) {
+                var position = gamefield.getGridPositionByIndex(indexX, indexY);
+
+                var grid = new Grid(
+                    indexX,
+                    indexY,
+                    position
+                );
+                gamefield.grid[indexX][indexY] = grid;
+            }
         }
-    }
+    })();
 
     gamefield.addJewels = function (numbersToAdd) {
         if (!numbersToAdd || typeof numbersToAdd != "number") {
@@ -63,7 +70,7 @@ function GameField(config) {
                 for (var indexX = numberOfFields - 1; indexX >= 0; indexX--) {
                     grid = gamefield.grid[indexX][indexY];
                     if (grid) {
-                        if (!grid.isBlocked) {
+                        if (grid.isBlocked == false) {
                             grid.addChild(jewel);
                             return;
                         }
@@ -77,9 +84,9 @@ function GameField(config) {
         var notUsedGrids = [];
         for (var indexx = 0; indexx < numberOfFields; indexx++) {
             for (var indexy = 0; indexy < numberOfFields; indexy++) {
-                gridField = gamefield.grid[indexx][indexy];
-                if (gridField.isBlocked == false) {
-                    notUsedGrids.push(gridField);
+                grid = gamefield.grid[indexx][indexy];
+                if (grid.isBlocked == false) {
+                    notUsedGrids.push(grid);
                 }
             }
         }
@@ -93,8 +100,8 @@ function GameField(config) {
         // destroy all
         for (var indexx = 0; indexx < numberOfFields; indexx++) {
             for (var indexy = 0; indexy < numberOfFields; indexy++) {
-                gridField = gamefield.grid[indexx][indexy];
-                gridField.destroyChild();
+                grid = gamefield.grid[indexx][indexy];
+                grid.destroyChild();
             }
         }
         score = -1;
@@ -102,6 +109,31 @@ function GameField(config) {
         gamefield.initGame();
     };
 
+    gamefield.letJewelsFall = function () {
+        for (var indexx = numberOfFields - 1; indexx >= 0; indexx--) {
+            for (var indexy = numberOfFields - 1; indexy >= 0; indexy--) {
+                grid = gamefield.grid[indexx][indexy];
+                if (grid != "undefined") {
+                    if (grid.isBlocked == false) {
+                        for (var indexy2 = indexy; indexy2 >= 0; indexy2--) {
+                            var gridToTakeFrom = gamefield.grid[indexx][indexy2];
+                            if (gridToTakeFrom != "undefined") {
+                                if (
+                                    gridToTakeFrom.isBlocked == true
+                                    && grid.isBlocked == false
+                                ) {
+                                    var child = gridToTakeFrom.child;
+                                    gridToTakeFrom.removeChild();
+                                    grid.addChild(child);
+                                    indexy2 = indexy;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    };
 
     gamefield.initGame = function () {
         gamefield.addJewels(numberOfFields * numberOfFields)
